@@ -1,0 +1,5 @@
+Hola Esto Es Una
+Prueba Del Archivo
+2
+punto
+txt
