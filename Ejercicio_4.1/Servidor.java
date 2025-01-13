@@ -88,10 +88,9 @@ public class Servidor extends Thread{
                 }
             }
 
-            //Cierro la conexión con el cliente y decremento el contador de clientes
+            //Cierro la conexión con el cliente
             synchronized (Servidor.class) {
                 skCliente.close();
-                contadorClientes--;
                 System.out.println("Cliente " + idCliente + " desconectado");
             }
 
