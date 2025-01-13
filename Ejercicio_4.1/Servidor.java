@@ -4,20 +4,29 @@ import java.io.*;
 import java.net.*;
 
 public class Servidor extends Thread{
+
+    //Contador de clientes conectados
+    private static int contadorClientes = 0;
+    private int idCliente;
+
+    //Socket del cliente
     Socket skCliente;
     static final int PUERTO = 2000;
+
+    //Constructor
     public Servidor (Socket sCliente){
         skCliente = sCliente;
+        idCliente = ++contadorClientes;
     }
 
+    //Creación de un servidor que escucha en el puerto 2000
     public static void main (String[] args){
         try (ServerSocket servidor = new ServerSocket(PUERTO)) {
             System.out.println("Servidor escuchando en el puerto " + PUERTO);
 
             while (true){
                 Socket skCliente = servidor.accept();
-                System.out.println("Cliente conectado desde " + skCliente.getInetAddress());
-
+                System.out.println("Cliente " + (contadorClientes + 1) + " conectado desde " + skCliente.getInetAddress());
                 //Manejo la conexión de un nuevo hilo
                 new Servidor(skCliente).start();
             }
@@ -26,6 +35,7 @@ public class Servidor extends Thread{
         }
     }
 
+    //Función run que se ejecuta al iniciar el hilo, contiene la lógica del servidor
     public void run(){
         try {
             InputStream in = skCliente.getInputStream();
@@ -77,8 +87,15 @@ public class Servidor extends Thread{
                     }
                 }
             }
-            skCliente.close();
-            System.out.println("Cliente desconectado");
+
+            //Cierro la conexión con el cliente y decremento el contador de clientes
+            synchronized (Servidor.class) {
+                skCliente.close();
+                contadorClientes--;
+                System.out.println("Cliente " + idCliente + " desconectado");
+            }
+
+
         } catch (IOException e) {
             System.out.println("Error en la comunicación con el cliente: " + e.getMessage());
         }
