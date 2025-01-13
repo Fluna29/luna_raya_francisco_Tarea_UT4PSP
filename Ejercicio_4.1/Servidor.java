@@ -3,33 +3,39 @@ package ejercicio_1;
 import java.io.*;
 import java.net.*;
 
-public class Servidor {
+public class Servidor extends Thread{
+    Socket skCliente;
     static final int PUERTO = 2000;
+    public Servidor (Socket sCliente){
+        skCliente = sCliente;
+    }
 
-    public void iniciarServidor(){
-
+    public static void main (String[] args){
         try (ServerSocket servidor = new ServerSocket(PUERTO)) {
             System.out.println("Servidor escuchando en el puerto " + PUERTO);
 
             while (true){
-                Socket cliente = servidor.accept();
-                System.out.println("Cliente conectado desde " + cliente.getInetAddress());
+                Socket skCliente = servidor.accept();
+                System.out.println("Cliente conectado desde " + skCliente.getInetAddress());
 
                 //Manejo la conexión de un nuevo hilo
-                new Thread(() -> manejarCliente(cliente)).start();
+                new Servidor(skCliente).start();
             }
         }catch (IOException e){
             System.out.println("Error en el servidor: " + e);
         }
     }
 
-    private void manejarCliente(Socket cliente){
-        try(cliente){
-            InputStream in = cliente.getInputStream();
+    public void run(){
+        try {
+            InputStream in = skCliente.getInputStream();
             DataInputStream flujo_entrada = new DataInputStream(in);
 
-            OutputStream out = cliente.getOutputStream();
+            OutputStream out = skCliente.getOutputStream();
             DataOutputStream flujo_salida = new DataOutputStream(out);
+
+            //Envío un mensaje al cliente
+            flujo_salida.writeUTF("¡Bienvenido al servidor! Adivina el número entre 0 y 100");
 
             //El servidor genera un número aleatorio entre 0 y 100, ambos inclusive
             int numRandom = (int) (Math.random() * 101);
@@ -71,15 +77,14 @@ public class Servidor {
                     }
                 }
             }
+            skCliente.close();
+            System.out.println("Cliente desconectado");
         } catch (IOException e) {
             System.out.println("Error en la comunicación con el cliente: " + e.getMessage());
         }
     }
 
-    public static void main (String[] args){
-        Servidor servidor =new Servidor();
-        servidor.iniciarServidor();
-    }
+
 }
 
 

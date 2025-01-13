@@ -9,24 +9,20 @@ public class Cliente {
     private static final String HOST = "localhost";
     private static final int PUERTO = 2000;
 
-    public void conectar(){
-        try(Socket scliente = new Socket(HOST, PUERTO)) {
+    public Cliente(){
+        try(Socket sCliente = new Socket(HOST, PUERTO)) {
             System.out.println("Conectado al servidor en el puerto " + PUERTO);
-            manejarComunicacion(scliente);
-        }catch (IOException e){
-            System.out.println("Error en el cliente: " + e);
-        }
-    }
-
-    private void manejarComunicacion(Socket socket) {
-        try {
             // Flujo de salida (hacia el servidor)
-            OutputStream out = socket.getOutputStream();
+            OutputStream out = sCliente.getOutputStream();
             DataOutputStream flujo_salida = new DataOutputStream(out);
 
             // Flujo de entrada (desde el servidor)
-            InputStream in = socket.getInputStream();
+            InputStream in = sCliente.getInputStream();
             DataInputStream flujo_entrada = new DataInputStream(in);
+
+            // Leer el mensaje de bienvenida del servidor
+            String mensaje = flujo_entrada.readUTF();
+            System.out.println("Mensaje del servidor: " + mensaje);
 
             boolean numCorrecto = false;  // Controla si se ha adivinado el número
             int numero = 0;              // Número introducido por el usuario
@@ -65,13 +61,12 @@ public class Cliente {
                     numCorrecto = true;
                 }
             }
-        } catch (IOException e) {
-            System.out.println("Error en la comunicación con el servidor: " + e.getMessage());
+        }catch (IOException e){
+            System.out.println("Error en el cliente: " + e);
         }
     }
 
     public static void main(String [] args){
-        Cliente cliente = new Cliente();
-        cliente.conectar();
+        new Cliente();
     }
 }
