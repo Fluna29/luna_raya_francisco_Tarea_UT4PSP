@@ -9,7 +9,7 @@ public class Servidor extends Thread{
     private static int contadorClientes = 0;
     private int idCliente;
 
-    //Socket del cliente
+    //Socket del cliente y puerto a conectarse
     Socket skCliente;
     static final int PUERTO = 2000;
 
