@@ -13,7 +13,7 @@ public class Servidor extends Thread {
     Socket skCliente;
     static final int PUERTO = 1500;
 
-    private int estado = 1;
+    private int estado = 0;
 
     public Servidor (Socket scliente) {
         skCliente = scliente;
@@ -44,6 +44,7 @@ public class Servidor extends Thread {
 
             boolean sesionIniciada = false;
             while (!sesionIniciada){
+                estado = 1;
                 // Autenticación
                 flujo_salida.writeUTF("Introduce tu usuario: ");
                 String usuarioCliente = flujo_entrada.readUTF();
@@ -61,11 +62,13 @@ public class Servidor extends Thread {
             }
 
             do {
+                estado = 2;
                 flujo_salida.writeUTF("\nIntroduce el comando (ls/get/exit): ");
                 String comando = flujo_entrada.readUTF();
 
                 switch (comando) {
                     case "ls" -> {
+                        estado = 3;
                         System.out.println("El cliente " + idCliente + " ha utilizado el comando ls.");
                         flujo_salida.writeUTF("Listado de archivos en el directorio del servidor:");
                         File directorio = new File(".\\Ejercicio_4.3\\");
@@ -78,6 +81,7 @@ public class Servidor extends Thread {
                         flujo_salida.writeUTF("FIN_LISTA"); // Marcador para finalizar la lista de archivos
                     }
                     case "get" -> {
+                        estado = 4;
                         System.out.println("El cliente " + idCliente + " ha utilizado el comando get.");
                         flujo_salida.writeUTF("\nIntroduce el nombre del archivo que deseas recibir:");
                         String nombreArchivo = flujo_entrada.readUTF();
@@ -85,6 +89,7 @@ public class Servidor extends Thread {
                         String filePath = ".\\Ejercicio_4.2\\ficheros_prueba\\" + nombreArchivo;
                         File archivo = new File(filePath);
 
+                        estado=5;
                         if (archivo.exists() && archivo.isFile()) {
                             flujo_salida.writeUTF("\nArchivo encontrado. Enviando contenido...\n");
                             try (BufferedReader lector = new BufferedReader(new FileReader(archivo))) {
